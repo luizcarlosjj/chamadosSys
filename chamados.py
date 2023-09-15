@@ -109,18 +109,37 @@ def estatisticas_show():
     tela_estatisticas.show()
     sts_aberto = str('Aberto')
     sts_concluido = str('Concluido')
+    sts_tratamento = str('Em tratamento')
     banco = sqlite3.connect("db/banco_chamados.db")
     cursor = banco.cursor()
+    # Chamados em Aberto
     cursor.execute("SELECT * FROM chamados WHERE status = '{}'" .format(sts_aberto))
     result01 = str(len(cursor.fetchall()))
+    # Chamados Concluidos
     cursor.execute("SELECT * FROM chamados WHERE status = '{}'" .format(sts_concluido))
     result02 = str(len(cursor.fetchall()))
+    # Chamados em Tratamento
+    cursor.execute("SELECT * FROM chamados WHERE status = '{}'" .format(sts_tratamento))
+    result03 = str(len(cursor.fetchall()))
+    # Labels:
     tela_estatisticas.label_4.setText(result01)
-    tela_estatisticas.label_5.setText(result02)
+    tela_estatisticas.label_7.setText(result02)
+    tela_estatisticas.label_5.setText(result03)
+
     banco.commit()
     banco.close()
-# Conlcuir chamados
-def concluir_chamados_task():
+# Selecionar Chamados
+def selecionar_chamados():
+    banco = sqlite3.connect("db/banco_chamados.db")
+    cursor = banco.cursor()
+    id_digitado = int(tela_selecionar_chamados.lineEdit.text())
+    cursor.execute("UPDATE chamados SET status='Em tratamento' WHERE id={}".format(id_digitado))
+    banco.commit()
+    banco.close()
+    tela_selecionar_chamados.label_2.setText('Atribuido com sucesso!')
+    tela_selecionar_chamados.lineEdit.setText("")
+# Concluir chamados
+def alterar_status_chamados():
     banco = sqlite3.connect("db/banco_chamados.db")
     cursor = banco.cursor()
     id_digitado = int(tela_concluir_chamados.lineEdit.text())
@@ -129,6 +148,7 @@ def concluir_chamados_task():
     banco.close()
     tela_concluir_chamados.label_2.setText('Concluido com sucesso!')
     tela_concluir_chamados.lineEdit.setText("")
+    
 
 # abertura de telas:
 def abrir_cadastro_user():
@@ -140,9 +160,14 @@ def abrir_tratamento():
     tela_tratar_chamados.show()
 def abrir_concluir_chamados():
     tela_concluir_chamados.show()
+def abrir_selecionar_chamados():
+    tela_selecionar_chamados.show()
+
 # fechamento de telas:
 def logout_cadastro_user():
     tela_cadastro_user.close()
+    tela_cadastro_user.label_3.setText("")
+    tela_cadastro_user.user.setText("")
     login.show()
 def logout_tela_cliente():
     tela_cliente.close()
@@ -160,6 +185,9 @@ def logout_estatisticas():
 def logout_concluir_chamados():
     tela_concluir_chamados.close()
     tela_tratar_chamados.show()
+def logout_selecionar_chamados():
+    tela_selecionar_chamados.close()
+    tela_tratar_chamados.show()
 
 app = QtWidgets.QApplication([])
 
@@ -172,6 +200,8 @@ tela_cadastro_chamados = uic.loadUi("pages/cad_chamados.ui")
 tela_tratar_chamados = uic.loadUi("pages/tratar_chamados.ui")
 tela_estatisticas = uic.loadUi("pages/stats_chamados.ui")
 tela_concluir_chamados = uic.loadUi("pages/concluir_chamados.ui")
+tela_selecionar_chamados = uic.loadUi("pages/selecionar_chamados.ui")
+
 # tela LOGIN
 login.pushButton_2.clicked.connect(login_task)
 login.pushButton_3.clicked.connect(abrir_cadastro_user)
@@ -200,13 +230,18 @@ tela_cadastro_chamados.pushButton_2.clicked.connect(logout_tela_chamado)
 # tela TRATAR CHAMADOS
 tela_tratar_chamados.pushButton_2.clicked.connect(logout_chamados)
 tela_tratar_chamados.pushButton_3.clicked.connect(abrir_concluir_chamados)
+tela_tratar_chamados.pushButton_4.clicked.connect(abrir_selecionar_chamados)
 
 # tela ESTATISTICAS
 tela_estatisticas.pushButton_2.clicked.connect(logout_estatisticas)
 
-#tela CONCLUIR CHAMADOS
-tela_concluir_chamados.pushButton.clicked.connect(concluir_chamados_task)
+# tela CONCLUIR CHAMADO
+tela_concluir_chamados.pushButton.clicked.connect(alterar_status_chamados)
 tela_concluir_chamados.pushButton_2.clicked.connect(logout_concluir_chamados)
+
+# tela SELECIONAR CHAMADO
+tela_selecionar_chamados.pushButton.clicked.connect(selecionar_chamados)
+tela_selecionar_chamados.pushButton_2.clicked.connect(logout_selecionar_chamados)
 
 login.show()
 app.exec()
