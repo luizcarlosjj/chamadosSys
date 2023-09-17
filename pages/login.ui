@@ -291,6 +291,8 @@ background-color: rgb(0, 47, 0);</string>
       <property name="font">
        <font>
         <pointsize>11</pointsize>
+        <weight>75</weight>
+        <bold>true</bold>
        </font>
       </property>
       <property name="styleSheet">
@@ -362,7 +364,7 @@ border-radius: 10px;
        </font>
       </property>
       <property name="styleSheet">
-       <string notr="true">color: rgb(255, 255, 0);</string>
+       <string notr="true">color: rgb(0, 85, 127);</string>
       </property>
       <property name="text">
        <string/>
@@ -383,6 +385,8 @@ border-radius: 10px;
       <property name="font">
        <font>
         <pointsize>11</pointsize>
+        <weight>75</weight>
+        <bold>true</bold>
        </font>
       </property>
       <property name="styleSheet">

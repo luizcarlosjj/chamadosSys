@@ -50,7 +50,7 @@
        <x>180</x>
        <y>60</y>
        <width>391</width>
-       <height>391</height>
+       <height>411</height>
       </rect>
      </property>
      <property name="layoutDirection">
@@ -71,7 +71,7 @@ border-radius: 20px;
       <property name="geometry">
        <rect>
         <x>70</x>
-        <y>20</y>
+        <y>40</y>
         <width>250</width>
         <height>31</height>
        </rect>
@@ -82,6 +82,9 @@ border-radius: 20px;
         <weight>75</weight>
         <bold>true</bold>
        </font>
+      </property>
+      <property name="cursor">
+       <cursorShape>ArrowCursor</cursorShape>
       </property>
       <property name="styleSheet">
        <string notr="true">color: rgb(255, 255, 255);
@@ -103,7 +106,7 @@ border-radius: 10px;
       <property name="geometry">
        <rect>
         <x>110</x>
-        <y>60</y>
+        <y>80</y>
         <width>191</width>
         <height>21</height>
        </rect>
@@ -126,7 +129,7 @@ border-radius: 10px;
       <property name="geometry">
        <rect>
         <x>70</x>
-        <y>90</y>
+        <y>110</y>
         <width>250</width>
         <height>31</height>
        </rect>
@@ -142,6 +145,9 @@ background-color: rgb(89, 89, 89);
 border-radius: 10px;
 </string>
       </property>
+      <property name="placeholderText">
+       <string>Filial</string>
+      </property>
       <item>
        <property name="text">
         <string/>
@@ -152,7 +158,7 @@ border-radius: 10px;
       <property name="geometry">
        <rect>
         <x>110</x>
-        <y>130</y>
+        <y>150</y>
         <width>191</width>
         <height>21</height>
        </rect>
@@ -199,7 +205,7 @@ border-radius: 10px;
       <property name="geometry">
        <rect>
         <x>70</x>
-        <y>160</y>
+        <y>180</y>
         <width>261</width>
         <height>71</height>
        </rect>
@@ -225,7 +231,7 @@ background-color: rgb(89, 89, 89);
       <property name="geometry">
        <rect>
         <x>100</x>
-        <y>240</y>
+        <y>260</y>
         <width>181</width>
         <height>21</height>
        </rect>
@@ -248,7 +254,7 @@ background-color: rgb(89, 89, 89);
       <property name="geometry">
        <rect>
         <x>150</x>
-        <y>280</y>
+        <y>300</y>
         <width>81</width>
         <height>21</height>
        </rect>
@@ -268,7 +274,7 @@ background-color: rgb(89, 89, 89);
       <property name="geometry">
        <rect>
         <x>40</x>
-        <y>280</y>
+        <y>300</y>
         <width>101</width>
         <height>21</height>
        </rect>
@@ -288,7 +294,7 @@ background-color: rgb(89, 89, 89);
       <property name="geometry">
        <rect>
         <x>230</x>
-        <y>280</y>
+        <y>300</y>
         <width>131</width>
         <height>21</height>
        </rect>
@@ -307,15 +313,15 @@ background-color: rgb(89, 89, 89);
      <widget class="QPushButton" name="btnCadCmd">
       <property name="geometry">
        <rect>
-        <x>110</x>
-        <y>320</y>
-        <width>181</width>
+        <x>100</x>
+        <y>340</y>
+        <width>201</width>
         <height>31</height>
        </rect>
       </property>
       <property name="font">
        <font>
-        <pointsize>10</pointsize>
+        <pointsize>11</pointsize>
         <weight>75</weight>
         <bold>true</bold>
        </font>
@@ -336,9 +342,9 @@ background-color: rgb(0, 47, 0);</string>
      <widget class="QLabel" name="label_6">
       <property name="geometry">
        <rect>
-        <x>110</x>
-        <y>360</y>
-        <width>181</width>
+        <x>100</x>
+        <y>380</y>
+        <width>201</width>
         <height>21</height>
        </rect>
       </property>
@@ -422,7 +428,7 @@ background-color: rgb(0, 47, 0);</string>
      <property name="geometry">
       <rect>
        <x>590</x>
-       <y>410</y>
+       <y>430</y>
        <width>111</width>
        <height>41</height>
       </rect>

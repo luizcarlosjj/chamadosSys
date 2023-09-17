@@ -87,15 +87,18 @@ def login_TratChamados():
         inicio.label_3.setText('Usuário sem permissão para está ação!')
     elif tipo == 'tecnico':
         tela_tratar_chamados.show()
-def login_Stats():
-    tela_estatisticas.show()
-    inicio.label_3.setText("")
+        inicio.close()
 def logout_inicio():
     inicio.close()
     home.show()
     item = ""
     home.tipoLog.setCurrentText(item)
     home.label_6.setText("")
+    inicio.label_3.setText("")
+
+    home.frame_off_login.show()
+    home.frame_Login.close()
+    home.frame_Cadastro.close()
 
 
 # CADASTRO DE CHAMADOS:
@@ -137,12 +140,15 @@ def logout_chamados():
 
 
 # TRATAMENTO DE CHAMADOS:
-def chamados_View_Select():
-    tela_tratar_chamados.show()
-    tela_tratar_chamados.res_Select.setText("")
-    tela_tratar_chamados.frame_select.show()
-    tela_tratar_chamados.frame_conclui.close()
-    tela_tratar_chamados.frame_off.close()
+def chamados_View_Select(): # MOSTRAR TABELA DE DADOS SELECT
+    tela_tratar_chamados.res_Conclui.setText("")# APAGAR TEXTO DA OUTRA TELA
+    tela_tratar_chamados.res_Conclui_True.setText("")# APAGAR TEXTO DA OUTRA TELA
+    tela_tratar_chamados.id_Conclui.setText("")# APAGAR ID DA OUTRA TELA
+
+    tela_tratar_chamados.frame_select.show() # ABRIR FRAME SELECT
+    tela_tratar_chamados.frame_conclui.close()# FECHAR FRAME CONCLUIR
+    tela_tratar_chamados.frame_off.close()# FECHAR FRAME OFF
+
     banco = sqlite3.connect('db/banco_chamados.db')
     cursor = banco.cursor()
     cursor.execute("SELECT * FROM chamados")
@@ -157,12 +163,17 @@ def chamados_View_Select():
         for j in range(len(rows[0])): #coluna
             item = QtWidgets.QTableWidgetItem(f"{rows[i][j]}")
             tela_tratar_chamados.tableWidgetSelect.setItem(i,j, item) 
-def chamados_View_Concluir():
-    tela_tratar_chamados.show()
-    tela_tratar_chamados.res_Conclui.setText("")
+
+def chamados_View_Concluir(): # MOSTRAR TABELA DE DADOS CONCLUIR
+
+    tela_tratar_chamados.res_Select.setText("")
+    tela_tratar_chamados.res_Select_True.setText("")
+    tela_tratar_chamados.id_Select.setText("")
+
     tela_tratar_chamados.frame_conclui.show()
     tela_tratar_chamados.frame_select.close()
     tela_tratar_chamados.frame_off.close()
+
     banco = sqlite3.connect('db/banco_chamados.db')
     cursor = banco.cursor()
     cursor.execute("SELECT * FROM chamados")
@@ -177,42 +188,70 @@ def chamados_View_Concluir():
         for j in range(len(rows[0])): #coluna
             item = QtWidgets.QTableWidgetItem(f"{rows[i][j]}")
             tela_tratar_chamados.tableWidgetConcluir.setItem(i,j, item) 
+
 def voltar():
     tela_tratar_chamados.close()
-    tela_tratar_chamados.label_3.setText('')
+    inicio.show()
 def limpar():
     tela_tratar_chamados.frame_conclui.close()
     tela_tratar_chamados.frame_select.close()
     tela_tratar_chamados.frame_off.show()
+    
+    tela_tratar_chamados.res_Select.setText("")
+    tela_tratar_chamados.res_Select_True.setText("")
+    tela_tratar_chamados.id_Select.setText("")
 
+    tela_tratar_chamados.res_Conclui.setText("")
+    tela_tratar_chamados.res_Conclui_True.setText("")
+    tela_tratar_chamados.id_Conclui.setText("")
 
-def selecionar_chamados():
+def selecionar_chamados(): ##  EM ABERTO --> EM TRATAMENTO
     banco = sqlite3.connect("db/banco_chamados.db")
     cursor = banco.cursor()
     id_digitado = int(tela_tratar_chamados.id_Select.text())
-    cursor.execute("UPDATE chamados SET status='Em tratamento' WHERE id={}".format(id_digitado))
-    banco.commit()
-    banco.close()
-    tela_tratar_chamados.res_Select.setText('Atribuido com sucesso!')
-    tela_tratar_chamados.id_Select.setText("")
-    chamados_View_Select()
+    cursor.execute("SELECT status FROM chamados WHERE id='{}'".format(id_digitado))
+    status_id = cursor.fetchall() 
+    if status_id[0][0] == 'Em tratamento':    
+        tela_tratar_chamados.res_Select.setText("Chamado Já está em Tratamento!")  
+    elif status_id[0][0] == 'Concluido':
+        tela_tratar_chamados.res_Select.setText("Chamado Já está Concluído!")
+    elif status_id[0][0] == "Aberto": # SE ESSE FOR VERDADE IRÁ REALIZAR
+        tela_tratar_chamados.res_Select_True.setText('Atribuido com sucesso!')
+        tela_tratar_chamados.res_Select.setText("")
+        tela_tratar_chamados.id_Select.setText("")
+        cursor.execute("UPDATE chamados SET status='Em tratamento' WHERE id={}".format(id_digitado))
+        banco.commit()
+        banco.close()        
+        
+        chamados_View_Select()
+    else:
+        print('error')
 
-def concluir_chamados():
+def concluir_chamados(): ##  EM TRATAMENTO --> CONCLUIDO
     banco = sqlite3.connect("db/banco_chamados.db")
     cursor = banco.cursor()
     id_digitado = int(tela_tratar_chamados.id_Conclui.text())
-    cursor.execute("UPDATE chamados SET status='Concluido' WHERE id={}".format(id_digitado))
-    banco.commit()
-    banco.close()
-    tela_tratar_chamados.res_Conclui.setText('Concluido com sucesso!')
-    tela_tratar_chamados.id_Conclui.setText("")
-    chamados_View_Concluir()
+    cursor.execute("SELECT status FROM chamados WHERE id='{}'".format(id_digitado))
+    status_id = cursor.fetchall() 
+    if status_id[0][0] == 'Concluido':
+        tela_tratar_chamados.res_Conclui.setText("Chamado já está Concluído!")
+    elif status_id[0][0] == 'Em tratamento':
+        tela_tratar_chamados.res_Conclui_True.setText("Concluído com Sucesso!")
+        tela_tratar_chamados.res_Conclui.setText("")
 
+        tela_tratar_chamados.id_Conclui.setText("")
+        cursor.execute("UPDATE chamados SET status='Concluido' WHERE id={}".format(id_digitado))
+        banco.commit()
+        banco.close()
+        chamados_View_Concluir()
+    else:
+        print('error')
 
 
 # Mostrar Estatisticas
 def estatisticas_show():
-    tela_estatisticas.show()
+    estatisticas.show()
+    inicio.label_3.setText("")
     sts_aberto = str('Aberto')
     sts_concluido = str('Concluido')
     sts_tratamento = str('Em tratamento')
@@ -220,23 +259,22 @@ def estatisticas_show():
     cursor = banco.cursor()
     # Chamados em Aberto
     cursor.execute("SELECT * FROM chamados WHERE status = '{}'" .format(sts_aberto))
-    result01 = str(len(cursor.fetchall()))
+    resultAberto = str(len(cursor.fetchall()))
     # Chamados Concluidos
     cursor.execute("SELECT * FROM chamados WHERE status = '{}'" .format(sts_concluido))
-    result02 = str(len(cursor.fetchall()))
+    resultConcluido = str(len(cursor.fetchall()))
     # Chamados em Tratamento
     cursor.execute("SELECT * FROM chamados WHERE status = '{}'" .format(sts_tratamento))
-    result03 = str(len(cursor.fetchall()))
+    resultTratados = str(len(cursor.fetchall()))
     # Labels:
-    tela_estatisticas.label_4.setText(result01)
-    tela_estatisticas.label_7.setText(result02)
-    tela_estatisticas.label_5.setText(result03)
+    estatisticas.resAberto.setText(resultAberto)
+    estatisticas.resConcluidos.setText(resultConcluido)
+    estatisticas.resTrat.setText(resultTratados)
 
     banco.commit()
     banco.close()
-
 def logout_estatisticas():
-    tela_estatisticas.close()
+    estatisticas.close()
 
 
 app = QtWidgets.QApplication([])
@@ -246,6 +284,7 @@ inicio = uic.loadUi("pages/inicio.ui")
 chamados = uic.loadUi("pages/chamadosCad.ui")
 tela_tratar_chamados = uic.loadUi("pages/tratar_chamados.ui")
 tela_estatisticas = uic.loadUi("pages/stats_chamados.ui")
+estatisticas = uic.loadUi("pages/estatisticas.ui")
 
 # tela HOME
 home.frame_off_login.show()
@@ -259,7 +298,7 @@ home.filialCad.addItems(["","Lins 01","Lins 02"]) # ADICIONA DADOS AO COMBO BOX 
 # tela INICIO
 inicio.btnCadCmd.clicked.connect(login_CadChamados)
 inicio.btnTratCmd.clicked.connect(login_TratChamados)
-inicio.btnStats.clicked.connect(login_Stats)
+inicio.btnStats.clicked.connect(estatisticas_show)
 inicio.btnSairHome.clicked.connect(logout_inicio)
 
 # tela CADASTAR CHAMADOS
@@ -278,6 +317,7 @@ tela_tratar_chamados.btn_SelectCmd.clicked.connect(selecionar_chamados) # EXECUT
 tela_tratar_chamados.btn_ConcluirCmd.clicked.connect(concluir_chamados) # EXECUTAR CONCLUIR CHAMADOS
 
 # tela ESTATISTICAS
+estatisticas.btnVoltarStats.clicked.connect(logout_estatisticas)
 
 home.show()
 app.exec()
