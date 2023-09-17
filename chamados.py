@@ -129,9 +129,11 @@ def chamados_task():
                 """)
     
     cursor.execute("INSERT INTO chamados (nome_solicitante, descricao, categoria, status) VALUES ('"+nome+"', '"+descricao+"', '"+categoria+"', '"+status+"')")
+    cursor.execute("SELECT id FROM chamados WHERE nome_solicitante='{}'".format(nome))
+    id_solicitante = cursor.fetchall()
     banco.commit()
     banco.close()
-    chamados.label_6.setText('Chamado Cadastrado!')
+    chamados.label_6.setText('Chamado Cadastrado! o seu id é {}'.format(id_solicitante))
     chamados.nameCmd.setText('')
     chamados.descCmd.setText('')
     chamados.filialAtd.setCurrentText("")
@@ -148,6 +150,7 @@ def chamados_View_Select(): # MOSTRAR TABELA DE DADOS SELECT
     tela_tratar_chamados.frame_select.show() # ABRIR FRAME SELECT
     tela_tratar_chamados.frame_conclui.close()# FECHAR FRAME CONCLUIR
     tela_tratar_chamados.frame_off.close()# FECHAR FRAME OFF
+    tela_tratar_chamados.frame_search.close()
 
     banco = sqlite3.connect('db/banco_chamados.db')
     cursor = banco.cursor()
@@ -247,6 +250,67 @@ def concluir_chamados(): ##  EM TRATAMENTO --> CONCLUIDO
     else:
         print('error')
 
+def buscarChamados():
+    tela_tratar_chamados.frame_search.show()
+    tela_tratar_chamados.frame_conclui.close()
+    tela_tratar_chamados.frame_select.close()
+    tela_tratar_chamados.frame_off.close()
+
+    banco = sqlite3.connect("db/banco_chamados.db")
+    cursor = banco.cursor()
+    id_buscar = int(tela_tratar_chamados.idSearch.text())
+    cursor.execute("SELECT * FROM chamados WHERE id='{}'".format(id_buscar))
+    id_encontrado = cursor.fetchall()
+    tela_tratar_chamados.tableWidgetBuscar.setRowCount(len(id_encontrado))
+    tela_tratar_chamados.tableWidgetBuscar.setColumnCount(5)
+    tela_tratar_chamados.tableWidgetBuscar.setHorizontalHeaderLabels(["id","Nome do Solicitante","Descição", "categoria", "Status"])
+
+    rows = id_encontrado
+    for i in range(len(rows)): #linha
+        for j in range(len(rows[0])): #coluna
+            item = QtWidgets.QTableWidgetItem(f"{rows[i][j]}")
+            tela_tratar_chamados.tableWidgetBuscar.setItem(i,j, item) 
+
+def concluir_chamados_buscado():
+    banco = sqlite3.connect("db/banco_chamados.db")
+    cursor = banco.cursor()
+    id_buscado = int(tela_tratar_chamados.idSearch.text())
+    cursor.execute("SELECT status FROM chamados WHERE id='{}'".format(id_buscado))
+    status_id = cursor.fetchall() 
+    if status_id[0][0] == 'Concluido':
+        tela_tratar_chamados.res_ConcluirBuscar.setText("Chamado já está Concluído!")
+    elif status_id[0][0] == 'Em tratamento':
+        tela_tratar_chamados.res_ConcluirBuscar_True.setText("Concluído com Sucesso!")
+        tela_tratar_chamados.res_ConcluirBuscar.setText("")
+        tela_tratar_chamados.idSearch.setText("")
+        cursor.execute("UPDATE chamados SET status='Concluido' WHERE id={}".format(id_buscado))
+        banco.commit()
+        banco.close()
+        buscarChamados()
+    else:
+        print('error')
+
+def selecionar_chamados_buscados(): ##  EM ABERTO --> EM TRATAMENTO
+    banco = sqlite3.connect("db/banco_chamados.db")
+    cursor = banco.cursor()
+    id_digitado = int(tela_tratar_chamados.idSearch.text())
+    cursor.execute("SELECT status FROM chamados WHERE id='{}'".format(id_digitado))
+    status_id = cursor.fetchall() 
+    if status_id[0][0] == 'Em tratamento':    
+        tela_tratar_chamados.res_SelectBuscar.setText("Chamado Já está em Tratamento!")  
+    elif status_id[0][0] == 'Concluido':
+        tela_tratar_chamados.res_SelectBuscar.setText("Chamado Já está Concluído!")
+    elif status_id[0][0] == "Aberto": # SE ESSE FOR VERDADE IRÁ REALIZAR
+        tela_tratar_chamados.res_SelectBuscar_True.setText('Atribuido com sucesso!')
+        tela_tratar_chamados.res_SelectBuscar.setText("")
+        tela_tratar_chamados.idSearch.setText("")
+        cursor.execute("UPDATE chamados SET status='Em tratamento' WHERE id={}".format(id_digitado))
+        banco.commit()
+        banco.close()        
+        
+        buscarChamados()
+    else:
+        print('error')
 
 # Mostrar Estatisticas
 def estatisticas_show():
@@ -283,7 +347,6 @@ home = uic.loadUi("pages/login.ui")
 inicio = uic.loadUi("pages/inicio.ui")
 chamados = uic.loadUi("pages/chamadosCad.ui")
 tela_tratar_chamados = uic.loadUi("pages/tratar_chamados.ui")
-tela_estatisticas = uic.loadUi("pages/stats_chamados.ui")
 estatisticas = uic.loadUi("pages/estatisticas.ui")
 
 # tela HOME
@@ -315,6 +378,10 @@ tela_tratar_chamados.btn_Voltar.clicked.connect(voltar) # VOLTAR
 
 tela_tratar_chamados.btn_SelectCmd.clicked.connect(selecionar_chamados) # EXECUTAR SELECT CHAMADOS
 tela_tratar_chamados.btn_ConcluirCmd.clicked.connect(concluir_chamados) # EXECUTAR CONCLUIR CHAMADOS
+
+tela_tratar_chamados.btn_Buscar.clicked.connect(buscarChamados)
+tela_tratar_chamados.btn_ConcluirCmd_2.clicked.connect(concluir_chamados_buscado)
+tela_tratar_chamados.btn_SelectCmd_2.clicked.connect(selecionar_chamados_buscados) 
 
 # tela ESTATISTICAS
 estatisticas.btnVoltarStats.clicked.connect(logout_estatisticas)
