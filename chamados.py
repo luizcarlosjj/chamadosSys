@@ -76,7 +76,6 @@ def cadastro_task():
     else:
         home.resCad.setText("Digite uma senha válida!")
 
-
 # INICIO
 def login_CadChamados():
     chamados.show()
@@ -133,7 +132,7 @@ def chamados_task():
     id_solicitante = cursor.fetchall()
     banco.commit()
     banco.close()
-    chamados.label_6.setText('Chamado Cadastrado! o seu id é {}'.format(id_solicitante))
+    chamados.label_6.setText('Chamado Cadastrado! o seu id é {}'.format(id_solicitante[0][0]))
     chamados.nameCmd.setText('')
     chamados.descCmd.setText('')
     chamados.filialAtd.setCurrentText("")
@@ -166,12 +165,12 @@ def chamados_View_Select(): # MOSTRAR TABELA DE DADOS SELECT
         for j in range(len(rows[0])): #coluna
             item = QtWidgets.QTableWidgetItem(f"{rows[i][j]}")
             tela_tratar_chamados.tableWidgetSelect.setItem(i,j, item) 
-
 def chamados_View_Concluir(): # MOSTRAR TABELA DE DADOS CONCLUIR
 
     tela_tratar_chamados.res_Select.setText("")
     tela_tratar_chamados.res_Select_True.setText("")
     tela_tratar_chamados.id_Select.setText("")
+
 
     tela_tratar_chamados.frame_conclui.show()
     tela_tratar_chamados.frame_select.close()
@@ -192,23 +191,7 @@ def chamados_View_Concluir(): # MOSTRAR TABELA DE DADOS CONCLUIR
             item = QtWidgets.QTableWidgetItem(f"{rows[i][j]}")
             tela_tratar_chamados.tableWidgetConcluir.setItem(i,j, item) 
 
-def voltar():
-    tela_tratar_chamados.close()
-    inicio.show()
-def limpar():
-    tela_tratar_chamados.frame_conclui.close()
-    tela_tratar_chamados.frame_select.close()
-    tela_tratar_chamados.frame_off.show()
-    
-    tela_tratar_chamados.res_Select.setText("")
-    tela_tratar_chamados.res_Select_True.setText("")
-    tela_tratar_chamados.id_Select.setText("")
-
-    tela_tratar_chamados.res_Conclui.setText("")
-    tela_tratar_chamados.res_Conclui_True.setText("")
-    tela_tratar_chamados.id_Conclui.setText("")
-
-def selecionar_chamados(): ##  EM ABERTO --> EM TRATAMENTO
+def selecionar_chamados(): #  EM ABERTO --> EM TRATAMENTO
     banco = sqlite3.connect("db/banco_chamados.db")
     cursor = banco.cursor()
     id_digitado = int(tela_tratar_chamados.id_Select.text())
@@ -229,8 +212,7 @@ def selecionar_chamados(): ##  EM ABERTO --> EM TRATAMENTO
         chamados_View_Select()
     else:
         print('error')
-
-def concluir_chamados(): ##  EM TRATAMENTO --> CONCLUIDO
+def concluir_chamados(): # EM TRATAMENTO --> CONCLUIDO
     banco = sqlite3.connect("db/banco_chamados.db")
     cursor = banco.cursor()
     id_digitado = int(tela_tratar_chamados.id_Conclui.text())
@@ -250,67 +232,48 @@ def concluir_chamados(): ##  EM TRATAMENTO --> CONCLUIDO
     else:
         print('error')
 
-def buscarChamados():
-    tela_tratar_chamados.frame_search.show()
+def search():
+    tela_tratar_chamados.frame_search.show() # MOSTRAR 
     tela_tratar_chamados.frame_conclui.close()
     tela_tratar_chamados.frame_select.close()
     tela_tratar_chamados.frame_off.close()
 
-    banco = sqlite3.connect("db/banco_chamados.db")
+    valordigitado = tela_tratar_chamados.idSearch.text()
+
+    banco = sqlite3.connect('db/banco_chamados.db')
     cursor = banco.cursor()
-    id_buscar = int(tela_tratar_chamados.idSearch.text())
-    cursor.execute("SELECT * FROM chamados WHERE id='{}'".format(id_buscar))
-    id_encontrado = cursor.fetchall()
-    tela_tratar_chamados.tableWidgetBuscar.setRowCount(len(id_encontrado))
+    cursor.execute("SELECT * FROM chamados WHERE id = '{}'".format(valordigitado))
+    dados_lidos = cursor.fetchall()
+    
+    tela_tratar_chamados.tableWidgetBuscar.setRowCount(len(dados_lidos))
     tela_tratar_chamados.tableWidgetBuscar.setColumnCount(5)
     tela_tratar_chamados.tableWidgetBuscar.setHorizontalHeaderLabels(["id","Nome do Solicitante","Descição", "categoria", "Status"])
 
-    rows = id_encontrado
+    rows = dados_lidos
     for i in range(len(rows)): #linha
         for j in range(len(rows[0])): #coluna
             item = QtWidgets.QTableWidgetItem(f"{rows[i][j]}")
             tela_tratar_chamados.tableWidgetBuscar.setItem(i,j, item) 
+    banco.commit()
+    banco.close()
 
-def concluir_chamados_buscado():
-    banco = sqlite3.connect("db/banco_chamados.db")
-    cursor = banco.cursor()
-    id_buscado = int(tela_tratar_chamados.idSearch.text())
-    cursor.execute("SELECT status FROM chamados WHERE id='{}'".format(id_buscado))
-    status_id = cursor.fetchall() 
-    if status_id[0][0] == 'Concluido':
-        tela_tratar_chamados.res_ConcluirBuscar.setText("Chamado já está Concluído!")
-    elif status_id[0][0] == 'Em tratamento':
-        tela_tratar_chamados.res_ConcluirBuscar_True.setText("Concluído com Sucesso!")
-        tela_tratar_chamados.res_ConcluirBuscar.setText("")
-        tela_tratar_chamados.idSearch.setText("")
-        cursor.execute("UPDATE chamados SET status='Concluido' WHERE id={}".format(id_buscado))
-        banco.commit()
-        banco.close()
-        buscarChamados()
-    else:
-        print('error')
+def voltar():
+    tela_tratar_chamados.close()
+    inicio.show()
+def limpar():
+    tela_tratar_chamados.frame_conclui.close()
+    tela_tratar_chamados.frame_select.close()
+    tela_tratar_chamados.frame_off.show()
+    
+    tela_tratar_chamados.res_Select.setText("")
+    tela_tratar_chamados.res_Select_True.setText("")
+    tela_tratar_chamados.id_Select.setText("")
 
-def selecionar_chamados_buscados(): ##  EM ABERTO --> EM TRATAMENTO
-    banco = sqlite3.connect("db/banco_chamados.db")
-    cursor = banco.cursor()
-    id_digitado = int(tela_tratar_chamados.idSearch.text())
-    cursor.execute("SELECT status FROM chamados WHERE id='{}'".format(id_digitado))
-    status_id = cursor.fetchall() 
-    if status_id[0][0] == 'Em tratamento':    
-        tela_tratar_chamados.res_SelectBuscar.setText("Chamado Já está em Tratamento!")  
-    elif status_id[0][0] == 'Concluido':
-        tela_tratar_chamados.res_SelectBuscar.setText("Chamado Já está Concluído!")
-    elif status_id[0][0] == "Aberto": # SE ESSE FOR VERDADE IRÁ REALIZAR
-        tela_tratar_chamados.res_SelectBuscar_True.setText('Atribuido com sucesso!')
-        tela_tratar_chamados.res_SelectBuscar.setText("")
-        tela_tratar_chamados.idSearch.setText("")
-        cursor.execute("UPDATE chamados SET status='Em tratamento' WHERE id={}".format(id_digitado))
-        banco.commit()
-        banco.close()        
-        
-        buscarChamados()
-    else:
-        print('error')
+    tela_tratar_chamados.res_Conclui.setText("")
+    tela_tratar_chamados.res_Conclui_True.setText("")
+    tela_tratar_chamados.id_Conclui.setText("")
+
+
 
 # Mostrar Estatisticas
 def estatisticas_show():
@@ -379,9 +342,7 @@ tela_tratar_chamados.btn_Voltar.clicked.connect(voltar) # VOLTAR
 tela_tratar_chamados.btn_SelectCmd.clicked.connect(selecionar_chamados) # EXECUTAR SELECT CHAMADOS
 tela_tratar_chamados.btn_ConcluirCmd.clicked.connect(concluir_chamados) # EXECUTAR CONCLUIR CHAMADOS
 
-tela_tratar_chamados.btn_Buscar.clicked.connect(buscarChamados)
-tela_tratar_chamados.btn_ConcluirCmd_2.clicked.connect(concluir_chamados_buscado)
-tela_tratar_chamados.btn_SelectCmd_2.clicked.connect(selecionar_chamados_buscados) 
+tela_tratar_chamados.btn_Buscar.clicked.connect(search)
 
 # tela ESTATISTICAS
 estatisticas.btnVoltarStats.clicked.connect(logout_estatisticas)
